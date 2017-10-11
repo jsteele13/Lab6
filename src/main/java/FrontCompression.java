@@ -1,4 +1,5 @@
 import java.io.File;
+import java.util.Arrays;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -32,20 +33,18 @@ public class FrontCompression {
      * @return the input compressed using front encoding
      */
     public static String compress(final String corpus) {
-        /*
-         * Defend against bad inputs.
-         */
+        String[] words = corpus.split("\n");
+        String comp = "0 " + words[0];
         if (corpus == null) {
             return null;
         } else if (corpus.length() == 0) {
             return "";
         }
-
-        /*
-         * Complete this function.
-         */
-
-        return "";
+        for (int i = 1; i < words.length; i++) {
+            int prefixLength = longestPrefix(words[i - 1], words[i]);
+            comp += "\n" + prefixLength + " " + words[i].substring(prefixLength);
+        }
+        return comp;
     }
 
     /**
@@ -55,20 +54,32 @@ public class FrontCompression {
      * @return the input decompressed using front encoding
      */
     public static String decompress(final String corpus) {
-        /*
-         * Defend against bad inputs.
-         */
+        String[] words = corpus.split("\n");
+        String[] deComp = new String[words.length];
+        deComp[0] = words[0].substring(2);
         if (corpus == null) {
             return null;
         } else if (corpus.length() == 0) {
             return "";
         }
 
-        /*
-         * Complete this function.
-         */
+        //decompress words
+        for (int i = 1; i < words.length; i++) {
+            int prefixLength = Integer.parseInt(words[i].substring(0, words[i].indexOf(" ")));
+            if (prefixLength >= deComp[i - 1].length()) {
+                deComp[i] = deComp[i - 1] + words[i].substring(words[i].indexOf(" ") + 1);
+            } else {
+                deComp[i] = deComp[i - 1].substring(0, prefixLength)
+                        + words[i].substring(words[i].indexOf(" ") + 1);
+            }
+        }
 
-        return "";
+        //make deComp into a string
+        String done = "";
+        for (String s: deComp) {
+            done += s + "\n";
+        }
+        return done;
     }
 
     /**
@@ -79,10 +90,16 @@ public class FrontCompression {
      * @return the length of the common prefix between the two strings
      */
     private static int longestPrefix(final String firstString, final String secondString) {
-        /*
-         * Complete this function.
-         */
-        return 0;
+        boolean isSame = true;
+        int i = 0;
+        while (isSame && i < firstString.length() && i < secondString.length()) {
+            if (firstString.charAt(i) != secondString.charAt(i)) {
+                isSame = false;
+            } else {
+                i++;
+            }
+        }
+        return i;
     }
 
     /**
